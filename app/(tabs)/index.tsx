@@ -1,10 +1,17 @@
 import { Text, View, StyleSheet } from "react-native";
-import { Link } from "expo-router";
+import { TaskButton } from "../../components/(buttons)/taskbutton";
+import { BtnSidebar } from "@/components/(sidebar)/Sidebar";
 
 export default function Index() {
+  const handlePress = () => {
+    console.log("Button pressed!");
+  };
+
   return (
     <View style={styles.container}>
+      <BtnSidebar onPress={handlePress} />
       <Text style={styles.text}>Home screen</Text>
+      <TaskButton title="new Task" onPress={handlePress} />
     </View>
   );
 }
@@ -18,10 +25,6 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "#fff",
-  },
-  button: {
-    fontSize: 20,
-    textDecorationLine: "underline",
-    color: "#fff",
+    fontSize: 18,
   },
 });
