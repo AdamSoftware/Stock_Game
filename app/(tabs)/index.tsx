@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet } from "react-native";
 import { TaskButton } from "../../components/(buttons)/taskbutton";
-import { BtnSidebar } from "@/components/(sidebar)/Sidebar";
+import { SideBarMenu } from "../../components/(sidebar)/SideBarMenu";
 
 export default function Index() {
   const handlePress = () => {
@@ -9,7 +9,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <BtnSidebar onPress={handlePress} />
+      <SideBarMenu />
       <Text style={styles.text}>Home screen</Text>
       <TaskButton title="new Task" onPress={handlePress} />
     </View>
