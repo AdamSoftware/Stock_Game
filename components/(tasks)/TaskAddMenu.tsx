@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { TaskButton } from "../../components/(buttons)/taskbutton";
+import { SubmitButton } from "../(buttons)/SubmitButton";
+import { CloseTaskButton } from "../(buttons)/CloseTaskButton";
 import {
   View,
-  Text,
   StyleSheet,
   Modal,
   Dimensions,
-  TouchableOpacity,
   Animated,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons"; // Choose your icon set
 
 const ScreenHeight = Dimensions.get("window").height;
 
@@ -38,25 +37,15 @@ export const TaskAddMenu = () => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.overlay}>
-          {/* Animated Sidebar */}
           <Animated.View
             style={[styles.AddMenu, { transform: [{ translateY: slideAnim }] }]}
           >
-            <Text style={styles.modalText}>Add a New Task</Text>
-
-            {/* Close Modal Button */}
-            <TouchableOpacity
+            {/* this is build too close the minipage and is being called from the button components */}
+            <CloseTaskButton onPress={() => setModalVisible(false)} /> 
+            <SubmitButton
+              title="Create Task"
               onPress={() => setModalVisible(false)}
-              style={styles.closeButton}
-            >
-              <Icon
-                style={styles.closeButtonText}
-                name="close"
-                size={30}
-                color="#000"
-              />{" "}
-              {/* Add your icon */}
-            </TouchableOpacity>
+            />
           </Animated.View>
         </View>
       </Modal>
@@ -98,12 +87,4 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 20,
   },
-  closeButton: {
-    position: "absolute",
-    top: "5%",
-    left: "5%",
-    padding: 10,
-    borderRadius: 5,
-  },
-  closeButtonText: {},
 });
