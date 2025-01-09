@@ -70,9 +70,10 @@ export const SideBarMenu = () => {
               <View style={styles.SubItems}>
                 <TouchableOpacity
                   onPress={() => setModalVisible(true)}
-                  style={styles.iconButton}>
-                  <Icon name="settings" size={24} color="#fff"/>
-                  <Text style={styles.text} >Settings</Text>
+                  style={styles.iconButton}
+                >
+                  <Icon name="settings" size={24} color="#fff" />
+                  <Text style={styles.text}>Settings</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -100,9 +101,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   text: {
-    marginLeft: 10,        
+    marginLeft: 10,
     fontSize: 18,
-    color: "#F8F8FF",         
+    color: "#F8F8FF",
   },
   sidebar: {
     position: "absolute",

@@ -1,12 +1,15 @@
+import React from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
   return (
-    <Stack>
-      /* I can't get the routing too work without a errorpage to take you to the
-      rest of the pages */
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="+not-found" />
-    </Stack>
+    // Wrapping the root layout with GestureHandlerRootView
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+    </GestureHandlerRootView>
   );
 }
