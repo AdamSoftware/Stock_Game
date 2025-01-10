@@ -6,11 +6,9 @@ import { StockChart } from "../../components/(Charts)/StockChart";
 export default function Index() {
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <StockChart />
-        <SideBarMenu />
-        <AllStocks />
-      </ScrollView>
+      <StockChart />
+      <SideBarMenu />
+      <AllStocks />
     </View>
   );
 }

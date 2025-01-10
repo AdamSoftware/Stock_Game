@@ -1,45 +1,48 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { IconWithDynamicColor } from "./IconWithDynamics";
 import { DynamicAmounts } from "./DynamicAmounts";
+import { ScrollView } from "react-native-gesture-handler";
 
 export const AllStocks = ({ onPress }) => {
   return (
-    <View>
-      <TouchableOpacity onPress={onPress}>
-        <View style={styles.StockChildren}>
-          <Text style={styles.StockChildrenText}>Apple</Text>
-          <IconWithDynamicColor
-            name="arrow-upward"
-            condition="up"
-            style={styles.StockChildrenicon}
-          />
-          <DynamicAmounts
-            style={styles.StockChildrenAmount}
-            text={200}
-            condition="plus"
-          />
-          <Text style={styles.StockChildrenGraph}>Graph</Text>
-        </View>
-      </TouchableOpacity>
-      /* this is the second test down stock */
-      <TouchableOpacity onPress={onPress}>
-        <View style={styles.StockChildren}>
-          <Text style={styles.StockChildrenText}>Tesla</Text>
-          <IconWithDynamicColor
-            name="arrow-downward"
-            condition="down"
-            style={styles.StockChildrenicon}
-          />
+    <ScrollView>
+      <View>
+        <TouchableOpacity onPress={onPress}>
+          <View style={styles.StockChildren}>
+            <Text style={styles.StockChildrenText}>Apple</Text>
+            <IconWithDynamicColor
+              name="arrow-upward"
+              condition="up"
+              style={styles.StockChildrenicon}
+            />
+            <DynamicAmounts
+              style={styles.StockChildrenAmount}
+              text={200}
+              condition="plus"
+            />
+            <Text style={styles.StockChildrenGraph}>Graph</Text>
+          </View>
+        </TouchableOpacity>
+        /* this is the second test down stock */
+        <TouchableOpacity onPress={onPress}>
+          <View style={styles.StockChildren}>
+            <Text style={styles.StockChildrenText}>Tesla</Text>
+            <IconWithDynamicColor
+              name="arrow-downward"
+              condition="down"
+              style={styles.StockChildrenicon}
+            />
 
-          <DynamicAmounts
-            style={styles.StockChildrenAmount}
-            text={100}
-            condition="minus"
-          />
-          <Text style={styles.StockChildrenGraph}>Graph</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
+            <DynamicAmounts
+              style={styles.StockChildrenAmount}
+              text={100}
+              condition="minus"
+            />
+            <Text style={styles.StockChildrenGraph}>Graph</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
