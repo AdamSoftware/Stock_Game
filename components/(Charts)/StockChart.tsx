@@ -1,135 +1,122 @@
+// WARNING: that alpha vantage API you can only make 25 requests per day for free
+// must find a different API to use for this project but this will work for testing
+// I could sub for more requests but I don't want to pay for this project
+
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Dimensions,
-} from "react-native";
-import { LineChart } from "react-native-chart-kit"; // Import LineChart
+
+import { StyleSheet } from "react-native";
+
+import { LineChart } from "react-native-chart-kit";
+import { Dimensions } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-type StockData = {
-  time: string;
+interface OHLCData {
+  x: Date; // Date object for the x-axis
+  open: number;
   high: number;
+  low: number;
   close: number;
-};
+}
 
-const screenWidth = Dimensions.get("window").width;
+const { width } = Dimensions.get("window");
 
-export const StockChart = () => {
-  const [data, setData] = useState<StockData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const CandlestickChart: React.FC = () => {
+  const [data, setData] = useState<OHLCData[]>([]);
+  const [setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchStockData = async () => {
+    const fetchData = async () => {
       const apiKey = "YU9KJH0TKIDHYFQ4";
       const symbol = "AAPL";
-      const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${apiKey}&outputsize=compact`;
 
       try {
-        const response = await fetch(url);
-        const result = await response.json();
+        const response = await fetch(
+          `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${apiKey}&outputsize=compact`,
+        );
 
-        if (result["Time Series (Daily)"]) {
-          const historicalData = Object.entries(result["Time Series (Daily)"])
-            .slice(0, 10)
-            .map(([date, values]: [string, any]) => ({
-              time: date,
-              high: parseFloat(values["2. high"]),
-              close: parseFloat(values["4. close"]),
-            }));
-          setData(historicalData);
-        } else {
-          throw new Error("Invalid data returned");
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
         }
-      } catch (error: any) {
-        console.error("Error fetching stock data:", error);
-        setError("Failed to fetch stock data. Please try again later.");
-      } finally {
-        setLoading(false);
+
+        const rawData = await response.json();
+
+        const timeSeries = rawData["Time Series (Daily)"];
+        if (timeSeries) {
+          const parsedData = Object.entries(timeSeries).map(
+            ([date, values]: [string, any]) => ({
+              x: new Date(date),
+              open: parseFloat(values["1. open"]),
+              high: parseFloat(values["2. high"]),
+              low: parseFloat(values["3. low"]),
+              close: parseFloat(values["4. close"]),
+            }),
+          );
+
+          setData(parsedData.slice(0, 30).reverse());
+          setError(null);
+        } else {
+          console.error("no valid time series data found", rawData);
+        }
+      } catch (error) {
+        setError(error.message);
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchStockData();
+    fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading...</Text> {/* Wrap text correctly */}
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>{error}</Text>{" "}
-        {/* Wrap error text properly */}
-      </View>
-    );
-  }
-
-  const chartData = {
-    labels: data.map((entry) => entry.time),
+  // Transform data for LineChart (open-close points)
+  const transformedData = {
+    labels: data.map((d) => d.x.toLocaleDateString()),
     datasets: [
       {
-        data: data.map((entry) => entry.close),
-        strokeWidth: 2,
-        color: () => "#8884d8", // Line color
+        data: data.map((d) => d.close),
+        strokeWidth: 2, // Line thickness
+        color: (opacity = 1) => (opacity ? "green" : "red"),
       },
       {
-        data: data.map((entry) => entry.high),
-        strokeWidth: 2,
-        color: () => "#82ca9d", // Line color
+        data: data.map((d) => d.open),
+        strokeWidth: 2, // Line thickness
+        color: (opacity = 1) => (opacity ? "blue" : "yellow"),
       },
     ],
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView horizontal>
-        <LineChart
-          data={chartData}
-          width={300} // Extend width to make chart scrollable
-          height={300}
-          chartConfig={{
-            backgroundColor: "#fff",
-            backgroundGradientFrom: "#fff",
-            backgroundGradientTo: "#fff",
-            decimalPlaces: 2, // Round to 2 decimal places
-            color: () => "#000", // Line color
-            labelColor: () => "#000", // Label color
-            style: {
-              borderRadius: 16,
-            },
-          }}
-          withDots={false} // Remove dots from the line
-          withInnerLines={false} // Hide inner lines
-          withOuterLines={false} // Hide outer lines
-        />
-      </ScrollView>
-    </View>
+    <ScrollView style={styles.container}>
+      <LineChart
+        data={transformedData}
+        width={width - 40} // Set width of the chart
+        height={210}
+        chartConfig={{
+          backgroundGradientFrom: "#ffffff",
+          backgroundGradientTo: "#ffffff",
+          decimalPlaces: 2,
+          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          style: {
+            borderRadius: 16,
+          },
+          propsForDots: {
+            r: "6",
+            strokeWidth: "2",
+            stroke: "#ffa726",
+          },
+        }}
+        style={{
+          marginVertical: 8,
+          borderRadius: 16,
+        }}
+      />
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-  },
-  centered: {
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-  },
-  errorText: {
-    color: "red",
-    fontSize: 16,
+    marginTop: 25,
+    padding: 20,
   },
 });

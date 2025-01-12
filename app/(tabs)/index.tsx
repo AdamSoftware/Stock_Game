@@ -1,12 +1,12 @@
 import { View, StyleSheet, ScrollView } from "react-native";
 import { SideBarMenu } from "../../components/(sidebar)/SideBarMenu";
 import { AllStocks } from "../../components/(Bought_Stocks)/AllStocks";
-import { StockChart } from "../../components/(Charts)/StockChart";
+import { CandlestickChart } from "../../components/(Charts)/StockChart";
 
 export default function Index() {
   return (
     <View style={styles.container}>
-      <StockChart />
+      <CandlestickChart />
       <SideBarMenu />
       <AllStocks />
     </View>
