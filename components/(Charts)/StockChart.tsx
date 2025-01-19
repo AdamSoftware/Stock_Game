@@ -1,11 +1,5 @@
-// WARNING: that alpha vantage API you can only make 25 requests per day for free
-// must find a different API to use for this project but this will work for testing
-// I could sub for more requests but I don't want to pay for this project
-
 import React, { useEffect, useState } from "react";
-
-import { StyleSheet } from "react-native";
-
+import { StyleSheet, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -18,11 +12,11 @@ interface OHLCData {
   close: number;
 }
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 export const CandlestickChart: React.FC = () => {
   const [data, setData] = useState<OHLCData[]>([]);
-  const [setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,8 +33,8 @@ export const CandlestickChart: React.FC = () => {
         }
 
         const rawData = await response.json();
-
         const timeSeries = rawData["Time Series (Daily)"];
+
         if (timeSeries) {
           const parsedData = Object.entries(timeSeries).map(
             ([date, values]: [string, any]) => ({
@@ -52,12 +46,12 @@ export const CandlestickChart: React.FC = () => {
             }),
           );
 
-          setData(parsedData.slice(0, 30).reverse());
+          setData(parsedData.slice(0, 12).reverse());
           setError(null);
         } else {
-          console.error("no valid time series data found", rawData);
+          setError("No more time left LOSER!!!!! 😭");
         }
-      } catch (error) {
+      } catch (error: any) {
         setError(error.message);
         console.error("Error fetching data:", error);
       }
@@ -73,42 +67,55 @@ export const CandlestickChart: React.FC = () => {
       {
         data: data.map((d) => d.close),
         strokeWidth: 2, // Line thickness
-        color: (opacity = 1) => (opacity ? "green" : "red"),
+        color: (opacity = 1) => `rgba(0, 255, 0, ${opacity})`, // Green line for closing prices
       },
       {
         data: data.map((d) => d.open),
         strokeWidth: 2, // Line thickness
-        color: (opacity = 1) => (opacity ? "blue" : "yellow"),
+        color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`, // Blue line for opening prices
       },
     ],
   };
 
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
+
   return (
-    <ScrollView style={styles.container}>
-      <LineChart
-        data={transformedData}
-        width={width - 40} // Set width of the chart
-        height={210}
-        chartConfig={{
-          backgroundGradientFrom: "#ffffff",
-          backgroundGradientTo: "#ffffff",
-          decimalPlaces: 2,
-          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          style: {
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    >
+      {/* Vertical ScrollView for Chart */}
+      <ScrollView horizontal={true} contentContainerStyle={styles.chartWrapper}>
+        <LineChart
+          data={transformedData}
+          width={width * 2} // Set width to be large enough for horizontal scrolling
+          height={400} // Increase height for better vertical scrolling
+          chartConfig={{
+            backgroundGradientFrom: "#ffffff",
+            decimalPlaces: 2,
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Label color
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            style: {
+              borderRadius: 16,
+            },
+            propsForDots: {
+              r: "6",
+              strokeWidth: "2",
+              stroke: "#ffa726",
+            },
+          }}
+          style={{
+            marginVertical: 8,
             borderRadius: 16,
-          },
-          propsForDots: {
-            r: "6",
-            strokeWidth: "2",
-            stroke: "#ffa726",
-          },
-        }}
-        style={{
-          marginVertical: 8,
-          borderRadius: 16,
-        }}
-      />
+          }}
+        />
+      </ScrollView>
     </ScrollView>
   );
 };
@@ -116,7 +123,24 @@ export const CandlestickChart: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 25,
+    marginTop: 35,
     padding: 20,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    color: "red",
+    fontWeight: "bold",
+  },
+  chartWrapper: {
+    justifyContent: "center",
+    paddingTop: 80,
+    flexDirection: "row",
+    flexWrap: "nowrap",
   },
 });
